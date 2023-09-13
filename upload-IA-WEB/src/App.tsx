@@ -1,4 +1,5 @@
 import { FileVideo, Github, Upload, Wand2 } from 'lucide-react';
+import { Nav } from './components/Nav';
 import { Button } from './components/ui/button';
 import { Label } from './components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select';
@@ -9,19 +10,33 @@ import { Textarea } from './components/ui/textarea';
 function App() {
 	return (
 		<div className="flex min-h-screen flex-col">
-			<div className="flex w-full items-center justify-between border-b px-6 py-3 ">
-				<h1 className="text-xl font-bold">
-					Pormade<span className="text-green-600">.ai</span>
-				</h1>
-				<div className="flex items-center gap-3">
-					<span>Desenvolvido com 💚</span>
-					<Separator orientation="vertical" className="h-6" />
-					<Button variant={'outline'}>
-						<Github className="mx-2 h-4 w-4" />
-						Github
-					</Button>
-				</div>
-			</div>
+			<Nav.Root className="flex w-full items-center justify-between border-b px-6 py-3 ">
+				<Nav.Logo
+					drag
+					dragConstraints={{
+						top: -0,
+						right: 0,
+						bottom: 0,
+						left: -0,
+					}}
+					dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
+					dragElastic={0.5}
+				/>
+				<Nav.Actions>
+					<Nav.Action>
+						<span>Desenvolvido com 💚</span>
+					</Nav.Action>
+					<Nav.Action>
+						<Separator orientation="vertical" className="h-6" />
+					</Nav.Action>
+					<Nav.Action>
+						<Button variant={'outline'}>
+							<Github className="mx-2 h-4 w-4" />
+							Github
+						</Button>
+					</Nav.Action>
+				</Nav.Actions>
+			</Nav.Root>
 			<main className="flex flex-1 gap-6 p-6">
 				<div className="flex flex-1 flex-col gap-4 ">
 					<div className="grid flex-1 grid-rows-2 gap-4">
