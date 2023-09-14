@@ -9,14 +9,20 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
+		"@ffmpeg/ffmpeg": "^0.12.6",
+		"@ffmpeg/util": "^0.12.1",
 		"@radix-ui/react-label": "^2.0.2",
 		"@radix-ui/react-select": "^1.2.2",
 		"@radix-ui/react-separator": "^1.0.3",
 		"@radix-ui/react-slider": "^1.1.2",
 		"@radix-ui/react-slot": "^1.0.2",
+		"ai": "^2.2.12",
+		"axios": "^1.5.0",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
-		"react-icons": "^4.11.0"
+		"react-icons": "^4.11.0",
+		"react-use": "^17.4.0",
+		"sweetalert2": "^11.7.28"
 	},
 	"devDependencies": {
 		"@emotion/react": "^11.11.1",
