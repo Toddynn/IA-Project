@@ -9,7 +9,7 @@ import { postVideoRoute } from './routes/VideoRoutes/post-video';
 const app = fastify();
 
 app.register(FastifyCors, {
-	origin: 'http://localhost:3333',
+	origin: '*',
 });
 
 app.register(getAllPromptsRoute);
