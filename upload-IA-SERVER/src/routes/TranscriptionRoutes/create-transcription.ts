@@ -9,7 +9,7 @@ const TranscriptionParamsSchema = z.object({
 });
 
 const TranscriptionBodySchema = z.object({
-	prompt: z.string(),
+	prompt: z.string().optional(),
 });
 
 export async function createTranscriptionRoute(app: FastifyInstance) {
