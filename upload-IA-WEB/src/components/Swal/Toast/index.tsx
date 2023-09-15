@@ -1,6 +1,8 @@
 import Swal from 'sweetalert2';
 
 export const Toast = Swal.mixin({
+	background: '#27272a',
+	color: '#fff',
 	toast: true,
 	position: 'top-end',
 	showConfirmButton: false,
