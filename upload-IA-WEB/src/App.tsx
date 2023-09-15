@@ -2,7 +2,7 @@ import { Tooltip } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useCompletion } from 'ai/react';
 import { UUID } from 'crypto';
-import { AlertCircle, CheckCircle, FileVideo, Leaf, Upload, Wand2 } from 'lucide-react';
+import { AlertCircle, CheckCircle, ClipboardIcon, FileVideo, Leaf, Upload, Wand2 } from 'lucide-react';
 import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { PromptForm } from './components/Forms/PromptForm';
 import { VideoForm } from './components/Forms/VideoForm';
@@ -194,15 +194,20 @@ function App() {
 						<Textarea
 							value={input}
 							onChange={handleInputChange}
-							placeholder="inclua o prompt para a IA..."
+							placeholder="Inclua o prompt para a IA..."
 							className="scrollTextArea resize-none p-4 leading-relaxed"
 						/>
-						<Textarea
-							placeholder="Resultado gerado pela IA"
-							value={completion}
-							className="scrollTextArea resize-none p-4 leading-relaxed"
-							readOnly
-						/>
+						<div className="relative">
+							<Textarea
+								placeholder="Resultado gerado pela IA"
+								value={completion}
+								className="scrollTextArea relative h-full resize-none p-4 leading-relaxed"
+								readOnly
+							/>
+							<Button variant={'outline'} onClick={() => CopyToClipBoard(completion)} className="absolute right-5 top-5">
+								<ClipboardIcon className="h-4 w-4" />
+							</Button>
+						</div>
 					</div>
 					<span className="text-sm text-muted-foreground">
 						Lembre-se: você pode utilizar a variável <code className="text-green-500">{'{transcription}'}</code> no seu prompt para adicionar
