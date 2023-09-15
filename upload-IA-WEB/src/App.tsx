@@ -7,6 +7,8 @@ import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from 're
 import { PromptForm } from './components/Forms/PromptForm';
 import { VideoForm } from './components/Forms/VideoForm';
 import { Nav } from './components/Nav';
+import { Prompts } from './components/Prompts';
+import { Toast } from './components/Swal/Toast';
 import { Button } from './components/ui/button';
 import { Label } from './components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select';
@@ -80,14 +82,7 @@ function App() {
 		}
 	}, [status]);
 
-	const {
-		input,
-		setInput,
-		handleInputChange,
-		handleSubmit: handleUploadPrompt,
-		completion,
-		isLoading,
-	} = useCompletion({
+	const { input, setInput, handleInputChange, handleSubmit, completion, isLoading } = useCompletion({
 		api: 'http://localhost:3333/ai/complete',
 		body: {
 			videoId,
@@ -97,6 +92,18 @@ function App() {
 			'Content-Type': 'application/json',
 		},
 	});
+
+	function handleUploadPrompt(event: FormEvent<HTMLFormElement>) {
+		event.preventDefault();
+
+		if (!videoId)
+			return Toast.fire({
+				icon: 'info',
+				title: 'Você precisa carregar um vídeo primeiro',
+			});
+
+		return handleSubmit(event);
+	}
 
 	function handleChangeFile(event: ChangeEvent<HTMLInputElement>) {
 		const { files } = event.currentTarget;
@@ -156,7 +163,7 @@ function App() {
 	}, [file]);
 
 	return (
-		<div className="flex min-h-screen flex-col">
+		<div className="relative flex min-h-screen flex-col">
 			<Nav.Root className="flex w-full items-center justify-between border-b px-6 py-3 ">
 				<Nav.Logo
 					drag
@@ -181,14 +188,6 @@ function App() {
 						dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
 						dragElastic={0.5}
 					>
-						<Tooltip title={'Mais funcionalidades em breve'} placement="bottom">
-							<span>Desenvolvido com 💚</span>
-						</Tooltip>
-					</Nav.Action>
-					<Nav.Action>
-						<Separator orientation="vertical" className="h-6" />
-					</Nav.Action>
-					<Nav.Action>
 						<Tooltip title={'PETIM'} placement="bottom">
 							<a href="https://petim.pormadeonline.com.br/" target="_blank">
 								<Button variant={'outline'}>
@@ -200,7 +199,7 @@ function App() {
 				</Nav.Actions>
 			</Nav.Root>
 			<main className="flex flex-1 gap-6 p-6">
-				<div className="flex flex-1 flex-col gap-4 ">
+				<Prompts.Root className="pointer-events-none hidden sm:pointer-events-auto sm:flex">
 					<div className="grid flex-1 grid-rows-2 gap-4">
 						<Textarea
 							value={input}
@@ -220,12 +219,12 @@ function App() {
 							</Button>
 						</div>
 					</div>
-					<span className="text-sm text-muted-foreground">
+					<Prompts.Caption>
 						Lembre-se: você pode utilizar a variável <code className="text-green-500">{'{transcription}'}</code> no seu prompt para adicionar
 						o conteúdo da transcrição do vídeo selecionado
-					</span>
-				</div>
-				<aside className="w-80 space-y-6 ">
+					</Prompts.Caption>
+				</Prompts.Root>
+				<aside className="w-full space-y-6 sm:w-80 ">
 					<VideoForm.Root onSubmit={handleUploadFile}>
 						<VideoForm.Label htmlFor="video" className="relative overflow-hidden">
 							{previewURL ? (
@@ -240,7 +239,7 @@ function App() {
 							)}
 						</VideoForm.Label>
 						<VideoForm.Input
-							disabled={status !== 'waiting' && status !== 'success'}
+							disabled={(status !== 'waiting' && status !== 'success') || isLoading}
 							id="video"
 							type="file"
 							accept="video/mp4"
@@ -269,6 +268,7 @@ function App() {
 					</VideoForm.Root>
 
 					<Separator />
+
 					<PromptForm.Root onSubmit={handleUploadPrompt}>
 						<PromptForm.Action>
 							<Label>Prompt</Label>
@@ -285,7 +285,9 @@ function App() {
 								</SelectContent>
 							</Select>
 						</PromptForm.Action>
+
 						<Separator />
+
 						<PromptForm.Action className="space-y-4">
 							<Label>Temperatura</Label>
 							<Tooltip placement="top" title={temperature}>
@@ -295,7 +297,36 @@ function App() {
 								valores mais altos tendem a deixar o resultado mais criativo e com possíveis erros.
 							</span>
 						</PromptForm.Action>
+
 						<Separator />
+
+						<Prompts.Root className="sm:pointer-events-hidden pointer-events-auto flex sm:hidden">
+							<div className="grid flex-1 grid-rows-2 gap-4">
+								<Textarea
+									value={input}
+									onChange={handleInputChange}
+									placeholder="Inclua o prompt para a IA...
+{transcription}"
+									className="scrollTextArea h-full min-h-[254px] resize-none p-4 leading-relaxed"
+								/>
+								<div className="relative">
+									<Textarea
+										placeholder="Resultado gerado pela IA"
+										value={completion}
+										className="scrollTextArea relative h-full min-h-[254px] resize-none p-4 leading-relaxed"
+										readOnly
+									/>
+									<Button variant={'outline'} onClick={() => CopyToClipBoard(completion)} className="absolute right-5 top-5">
+										<ClipboardIcon className="h-4 w-4" />
+									</Button>
+								</div>
+							</div>
+							<Prompts.Caption>
+								Lembre-se: você pode utilizar a variável <code className="text-green-500">{'{transcription}'}</code> no seu prompt para
+								adicionar o conteúdo da transcrição do vídeo selecionado
+							</Prompts.Caption>
+						</Prompts.Root>
+
 						<PromptForm.Action>
 							<Button type="submit" disabled={isLoading} className="flex w-full items-center justify-center gap-2">
 								Executar
