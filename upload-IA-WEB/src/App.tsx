@@ -207,14 +207,18 @@ function App() {
 							placeholder="Inclua o prompt para a IA..."
 							className="scrollTextArea resize-none p-4 leading-relaxed"
 						/>
-						<div className="relative">
+						<div className="group relative ">
 							<Textarea
 								placeholder="Resultado gerado pela IA"
 								value={completion}
 								className="scrollTextArea relative h-full resize-none p-4 leading-relaxed"
 								readOnly
 							/>
-							<Button variant={'outline'} onClick={() => CopyToClipBoard(completion)} className="absolute right-5 top-5">
+							<Button
+								variant={'outline'}
+								onClick={() => CopyToClipBoard(completion)}
+								className="absolute right-5 top-5 hidden transition-all duration-75 group-hover:block"
+							>
 								<ClipboardIcon className="h-4 w-4" />
 							</Button>
 						</div>
@@ -309,14 +313,14 @@ function App() {
 {transcription}"
 									className="scrollTextArea h-full min-h-[254px] resize-none p-4 leading-relaxed"
 								/>
-								<div className="relative">
+								<div className=" relative">
 									<Textarea
 										placeholder="Resultado gerado pela IA"
 										value={completion}
 										className="scrollTextArea relative h-full min-h-[254px] resize-none p-4 leading-relaxed"
 										readOnly
 									/>
-									<Button variant={'outline'} onClick={() => CopyToClipBoard(completion)} className="absolute right-5 top-5">
+									<Button variant={'outline'} onClick={() => CopyToClipBoard(completion)} className="absolute bottom-5 right-5">
 										<ClipboardIcon className="h-4 w-4" />
 									</Button>
 								</div>
