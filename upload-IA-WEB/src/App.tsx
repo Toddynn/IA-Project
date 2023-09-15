@@ -26,6 +26,7 @@ export interface VideoConverted {
 	path: string;
 	transcription?: string;
 }
+
 function App() {
 	const [file, setFile] = useState<File | null>(null);
 	const [transcription, setTranscription] = useState<string | null>(null);
@@ -169,7 +170,17 @@ function App() {
 					dragElastic={0.5}
 				/>
 				<Nav.Actions>
-					<Nav.Action>
+					<Nav.Action
+						drag
+						dragConstraints={{
+							top: -0,
+							right: 0,
+							bottom: 0,
+							left: -0,
+						}}
+						dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
+						dragElastic={0.5}
+					>
 						<Tooltip title={'Mais funcionalidades em breve'} placement="bottom">
 							<span>Desenvolvido com 💚</span>
 						</Tooltip>
