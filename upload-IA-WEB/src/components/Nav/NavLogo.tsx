@@ -1,6 +1,7 @@
 import { MotionProps, motion } from 'framer-motion';
-
-export interface NavLogoProps extends MotionProps {}
+import { HTMLAttributes } from 'react';
+export type CombinedProps = MotionProps & HTMLAttributes<HTMLDivElement>;
+export interface NavLogoProps extends CombinedProps {}
 export const Fade = {
 	hidden: {
 		opacity: 0,
