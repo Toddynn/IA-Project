@@ -3,7 +3,12 @@ import { prisma } from '../../lib/prisma';
 
 export async function getAllVideosRoute(app: FastifyInstance) {
 	app.get('/videos', async () => {
-		const videos = await prisma.video.findMany({});
+		const videos = await prisma.video.findMany({
+			orderBy: {
+				createdAt: 'desc',
+			},
+		});
+
 		return videos;
 	});
 }

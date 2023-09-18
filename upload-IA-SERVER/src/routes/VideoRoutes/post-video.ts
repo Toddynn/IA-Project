@@ -1,4 +1,5 @@
 import { fastifyMultipart } from '@fastify/multipart';
+import 'dotenv/config';
 import { FastifyInstance } from 'fastify';
 import { randomUUID } from 'node:crypto';
 import fs from 'node:fs';
@@ -29,17 +30,23 @@ export async function postVideoRoute(app: FastifyInstance) {
 		const fileUploadName = `${fileBaseName}-${randomUUID()}${fileExtension}`;
 
 		const uploadDestination = path.resolve(__dirname, '../../../tmp', fileUploadName);
-		console.log(uploadDestination);
+		const url = `${process.env.APP_URL}/upload-IA-SERVER/tmp/${fileUploadName}`;
 
 		await pump(data.file, fs.createWriteStream(uploadDestination));
 
-		const video = await prisma.video.create({
-			data: {
-				name: data.filename,
-				path: uploadDestination,
-			},
-		});
+		try {
+			const video = await prisma.video.create({
+				data: {
+					name: data.filename,
+					path: uploadDestination,
+					url: url,
+				},
+			});
 
-		return { video };
+			return { video };
+		} catch (error) {
+			console.error(error);
+			return res.status(500).send({ message: 'Failed to create video record' });
+		}
 	});
 }
