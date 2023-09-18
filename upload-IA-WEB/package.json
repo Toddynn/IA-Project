@@ -9,6 +9,7 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
+		"@dhaiwat10/react-link-preview": "^1.15.0",
 		"@ffmpeg/ffmpeg": "^0.12.6",
 		"@ffmpeg/util": "^0.12.1",
 		"@radix-ui/react-label": "^2.0.2",
@@ -18,6 +19,7 @@
 		"@radix-ui/react-slot": "^1.0.2",
 		"ai": "^2.2.12",
 		"axios": "^1.5.0",
+		"date-fns": "^2.30.0",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
 		"react-icons": "^4.11.0",
