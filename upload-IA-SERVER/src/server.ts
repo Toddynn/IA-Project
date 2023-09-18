@@ -4,6 +4,7 @@ import { createCompletionRoute } from './routes/CompletionRoutes/create-completi
 import { getAllPromptsRoute } from './routes/PromptsRoutes/get-all-prompts';
 import { getUniquePromptRoute } from './routes/PromptsRoutes/get-unique-prompt';
 import { createTranscriptionRoute } from './routes/TranscriptionRoutes/create-transcription';
+import { getAllVideosRoute } from './routes/VideoRoutes/get-all-videos';
 import { postVideoRoute } from './routes/VideoRoutes/post-video';
 
 const app = fastify();
@@ -12,6 +13,7 @@ app.register(FastifyCors, {
 	origin: '*',
 });
 
+app.register(getAllVideosRoute);
 app.register(getAllPromptsRoute);
 app.register(getUniquePromptRoute);
 app.register(postVideoRoute);
