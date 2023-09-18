@@ -1,22 +1,28 @@
-import { Tooltip } from '@mui/material';
+import { Backdrop, Tooltip } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useCompletion } from 'ai/react';
 import { UUID } from 'crypto';
-import { AlertCircle, CheckCircle, ClipboardIcon, FileVideo, Leaf, Upload, Wand2 } from 'lucide-react';
+import { format } from 'date-fns';
+import { AnimatePresence } from 'framer-motion';
+import { AlertCircle, CheckCircle, ClipboardIcon, FileVideo, Headphones, Leaf, Play, Upload, Video, Wand2 } from 'lucide-react';
 import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { PromptForm } from './components/Forms/PromptForm';
 import { VideoForm } from './components/Forms/VideoForm';
+import { Modal } from './components/Modal';
 import { Nav } from './components/Nav';
 import { Prompts } from './components/Prompts';
 import { Toast } from './components/Swal/Toast';
 import { Button } from './components/ui/button';
+import { Input } from './components/ui/input';
 import { Label } from './components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select';
 import { Separator } from './components/ui/separator';
 import { Slider } from './components/ui/slider';
 import { Textarea } from './components/ui/textarea';
+import { dropIn } from './constants/animation';
 import { convertVideoToAudio } from './hooks/convertVideoToAudio';
 import { CopyToClipBoard } from './hooks/copyToClipBoard';
+import { dataGet } from './hooks/dataGet';
 import { api } from './lib/api/axios';
 
 export type Status = 'waiting' | 'converting' | 'converted' | 'uploading' | 'transcribing' | 'success' | 'error';
@@ -156,14 +162,53 @@ function App() {
 		}
 	}, [transcription]);
 
+	function handleCopyVideoTranscription(video: VideoConverted) {
+		if (video.transcription) {
+			CopyToClipBoard(video.transcription);
+		}
+	}
+
 	const previewURL = useMemo(() => {
 		if (!file) return null;
 
 		return URL.createObjectURL(file);
 	}, [file]);
 
+	const [showModalVideos, setShowModalVideos] = useState(false);
+	const toggleModalVideos = () => {
+		setShowModalVideos(!showModalVideos);
+	};
+
+	const { data: Videos } = dataGet<VideoConverted[]>(`/videos`);
+
+	const [audioUrl, setAudioUrl] = useState<string | undefined>(undefined);
+	const [isPlaying, setIsPlaying] = useState(false);
+	const audioRef = useRef<HTMLAudioElement | null>(null);
+
+	function handlePlayAudio(idVideo: string) {
+		const video = Videos?.find((video: VideoConverted) => video.id === idVideo);
+
+		if (video) {
+			console.log(video.path);
+			setAudioUrl(video.path);
+			audioRef.current = new Audio(video.path);
+			play();
+		}
+	}
+
+	const play = () => {
+		setIsPlaying(!isPlaying);
+		if (audioRef.current) {
+			return isPlaying ? audioRef.current.pause() : audioRef.current.play();
+		}
+	};
+
 	return (
-		<div className="relative flex min-h-screen flex-col">
+		<div className="min-w-screen relative flex min-h-screen flex-col overflow-x-hidden">
+			<audio ref={audioRef} controls className="sr-only">
+				<source src={audioUrl} type="audio/mpeg" />
+				Your browser does not support the audio element.
+			</audio>
 			<Nav.Root className="flex w-full items-center justify-between border-b px-6 py-3 ">
 				<Nav.Logo
 					drag
@@ -177,17 +222,12 @@ function App() {
 					dragElastic={0.5}
 				/>
 				<Nav.Actions>
-					<Nav.Action
-						drag
-						dragConstraints={{
-							top: -0,
-							right: 0,
-							bottom: 0,
-							left: -0,
-						}}
-						dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
-						dragElastic={0.5}
-					>
+					<Nav.Action>
+						<Button variant={'outline'} onClick={toggleModalVideos}>
+							<Video className="mx-2 h-4 w-4" />
+						</Button>
+					</Nav.Action>
+					<Nav.Action>
 						<Tooltip title={'PETIM'} placement="bottom">
 							<a href="https://petim.pormadeonline.com.br/" target="_blank">
 								<Button variant={'outline'}>
@@ -242,12 +282,13 @@ function App() {
 								</>
 							)}
 						</VideoForm.Label>
-						<VideoForm.Input
+						<Input
 							disabled={(status !== 'waiting' && status !== 'success') || isLoading}
 							id="video"
 							type="file"
 							accept="video/mp4"
 							onChange={handleChangeFile}
+							className="sr-only"
 						/>
 
 						<Separator />
@@ -263,6 +304,7 @@ function App() {
 							/>
 						</div>
 						<Button
+							type="submit"
 							disabled={status !== 'waiting'}
 							variant={status === 'success' ? 'default' : 'secondary'}
 							className="flex w-full items-center justify-center gap-2"
@@ -340,6 +382,67 @@ function App() {
 					</PromptForm.Root>
 				</aside>
 			</main>
+			<AnimatePresence mode="wait" initial={false} onExitComplete={() => null}>
+				{showModalVideos && (
+					<Backdrop component={'div'} open={showModalVideos} onClick={toggleModalVideos}>
+						<Modal.Root
+							variants={dropIn}
+							initial="hidden"
+							animate="visible"
+							exit="exit"
+							transition={{ duration: 0.6 }}
+							close={toggleModalVideos}
+							className="w-[75%] shadow-2xl md:w-[50%]"
+						>
+							<Modal.Content className="flex-1 justify-between">
+								<h1 className="text-primary">Vídeos já carregados</h1>
+
+								<div className="scrollTextArea flex max-h-[500px] w-full flex-1 flex-col gap-2 overflow-y-auto">
+									{Videos?.map((video: VideoConverted) => {
+										const createdAtFormated = format(new Date(video.createdAt), 'dd-MM-yyyy');
+										return (
+											<Button
+												key={video.id}
+												variant={'secondary'}
+												onClick={() => handleCopyVideoTranscription(video)}
+												className="flex h-16 w-full items-center justify-between gap-4 rounded-md border px-3 text-left"
+											>
+												<div className="flex items-center gap-4">
+													<div className="flex h-12 w-12 items-center justify-center rounded-md bg-indigo-800/70">
+														<Headphones />
+													</div>
+													<div className="flex flex-col gap-1">
+														<h1 className="line-clamp-1">{video.name}</h1>
+														<span className="text-xs text-muted-foreground">{createdAtFormated}</span>
+													</div>
+												</div>
+												<Button
+													size={'icon'}
+													className=" rounded-full"
+													onClick={(e: any) => {
+														e.stopPropagation();
+														handlePlayAudio(video.id);
+													}}
+												>
+													<Play className="translate-x-0.5" />
+												</Button>
+											</Button>
+										);
+									})}
+								</div>
+
+								<span className=" absolute bottom-2 cursor-default text-center text-sm text-muted-foreground">
+									Clique no vídeo desejado para copiar a{' '}
+									<Tooltip title={'A transcrição se refere à conversão do conteúdo de áudio ou vídeo em texto escrito.'}>
+										<span className="text-primary">transcrição</span>
+									</Tooltip>{' '}
+									em nossa base!
+								</span>
+							</Modal.Content>
+						</Modal.Root>
+					</Backdrop>
+				)}
+			</AnimatePresence>
 		</div>
 	);
 }
