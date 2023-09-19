@@ -31,7 +31,6 @@ function createTranscriptionRoute(app) {
                 },
             });
             const videoPath = video.path;
-            console.log(video, videoId, prompt);
             const audioReadStream = (0, node_fs_1.createReadStream)(videoPath);
             const responseOpenAI = yield openAI_1.openai.audio.transcriptions.create({
                 file: audioReadStream,
@@ -42,7 +41,6 @@ function createTranscriptionRoute(app) {
                 prompt,
             });
             const transcription = responseOpenAI.text;
-            console.log(transcription);
             yield prisma_1.prisma.video.update({
                 where: {
                     id: videoId,
