@@ -10,6 +10,7 @@
 		"moduleResolution": "Node",
 		"sourceMap": true,
 		"resolveJsonModule": true,
+		"baseUrl": ".",
 		"paths": {
 			"@prisma/client": ["node_modules/@prisma/client"]
 		}
