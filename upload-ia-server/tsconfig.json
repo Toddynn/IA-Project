@@ -9,7 +9,10 @@
 		"noImplicitAny": true,
 		"moduleResolution": "Node",
 		"sourceMap": true,
-		"resolveJsonModule": true
+		"resolveJsonModule": true,
+		"paths": {
+			"@prisma/client": ["node_modules/@prisma/client"]
+		}
 	},
 	"include": ["src/**/*"],
 	"exclude": ["node_modules", "**/*.spec.ts"]
